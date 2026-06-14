@@ -5,11 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.projectunified</groupId>
-    <artifactId>MavenTemplate</artifactId>
+    <artifactId>commonmark</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>MavenTemplate</name>
-    <description>A template for ProjectUnified's projects</description>
+    <name>commonmark</name>
+    <description>More extensions for commonmark-java</description>
     <url>https://github.com/ProjectUnified/${project.name}</url>
 
     <licenses>
@@ -26,6 +27,9 @@
             <url>https://github.com/HSGamer</url>
         </developer>
     </developers>
+    <modules>
+        <module>poi</module>
+    </modules>
 
     <issueManagement>
         <system>github</system>
@@ -42,6 +46,14 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.28.0</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
