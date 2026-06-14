@@ -1,0 +1,71 @@
+name: Build & Release
+
+on:
+  push:
+    tags: [ "*" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git tag --sort=-creatordate | head -n 2 | tail -n 1)
+          CURRENT_TAG=$(git describe --tags --abbrev=0)
+          if [ "$PREV_TAG" = "$CURRENT_TAG" ] || [ -z "$PREV_TAG" ]; then
+            echo "first_release=true" >> "$GITHUB_OUTPUT"
+            echo "changelog=This is marked as the first release" >> "$GITHUB_OUTPUT"
+          else
+            echo "first_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        if: steps.prev_tag.outputs.first_release == 'false'
+        uses: metcalfc/changelog-generator@v4.7.0
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Deploy to Central
+        run: mvn deploy -P central
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Generate Javadocs
+        run: mvn javadoc:aggregate-no-fork
+      - name: Deploy Javadocs
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/reports/apidocs
+
+      - name: "Release"
+        uses: softprops/action-gh-release@v3
+        with:
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          files: "**/target/*.jar"
