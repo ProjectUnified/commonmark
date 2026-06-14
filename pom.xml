@@ -29,6 +29,7 @@
     </developers>
     <modules>
         <module>poi</module>
+        <module>bbcode</module>
     </modules>
 
     <issueManagement>
