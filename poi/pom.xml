@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>commonmark-poi</artifactId>
+    <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>

@@ -10,4 +10,5 @@
     </parent>
 
     <artifactId>commonmark-bbcode</artifactId>
+    <name>${project.artifactId}</name>
 </project>
