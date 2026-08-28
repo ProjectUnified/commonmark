@@ -29,7 +29,7 @@ jobs:
       - name: Generate changelog
         id: changelog
         if: steps.prev_tag.outputs.first_release == 'false'
-        uses: metcalfc/changelog-generator@v4.8.0
+        uses: metcalfc/changelog-generator@v5.0.1
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
 
